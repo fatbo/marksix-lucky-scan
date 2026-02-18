@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/marksix-lucky-scan/sw.js', { scope: '/marksix-lucky-scan/' })})}
