@@ -34,7 +34,7 @@ export async function performOCR(
   };
 }
 
-function extractDrawNumber(text: string): string {
+export function extractDrawNumber(text: string): string {
   // Match patterns like "26/019", "期數 26/019", "Draw No. 26/019"
   const patterns = [
     /(\d{2,4}\/\d{2,3})/,
@@ -48,7 +48,7 @@ function extractDrawNumber(text: string): string {
   return '';
 }
 
-function extractNumbers(text: string): number[] {
+export function extractNumbers(text: string): number[] {
   // Look for sequences of numbers between 1-49
   const allNumbers: number[] = [];
   // Match lines with multiple 2-digit numbers
@@ -67,7 +67,7 @@ function extractNumbers(text: string): number[] {
   return allNumbers.slice(0, 7); // Max 7 numbers (6 + extra)
 }
 
-function extractUnits(text: string): number {
+export function extractUnits(text: string): number {
   const patterns = [
     /(\d+)\s*(?:注|Units?|Entries?)/i,
     /注數\s*[:\s]*(\d+)/i,
@@ -79,7 +79,7 @@ function extractUnits(text: string): number {
   return 1;
 }
 
-function extractAmount(text: string): number {
+export function extractAmount(text: string): number {
   const patterns = [
     /\$\s*([\d,]+(?:\.\d{1,2})?)/,
     /金額\s*[:\s]*\$?\s*([\d,]+(?:\.\d{1,2})?)/i,
