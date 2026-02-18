@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { compareNumbers } from '../utils/results';
+import { compareNumbers, parseHkjcJson } from '../utils/results';
 import type { DrawResult } from '../types';
 
 const mockResult: DrawResult = {
@@ -53,5 +53,41 @@ describe('compareNumbers', () => {
     const result = compareNumbers([1, 12, 2, 3, 4, 5], mockResult);
     expect(result.prizeTier).toBeNull();
     expect(result.prizeCategory).toBeNull();
+  });
+});
+
+describe('parseHkjcJson', () => {
+  it('parses a valid HKJC JSON array response', () => {
+    const raw = JSON.stringify([
+      {
+        no: '26/020',
+        date: '21/02/2026',
+        no1: 8, no2: 15, no3: 26, no4: 34, no5: 40, no6: 49,
+        sno: 5,
+      },
+    ]);
+    const result = parseHkjcJson(raw);
+    expect(result).not.toBeNull();
+    expect(result!.drawNumber).toBe('26/020');
+    expect(result!.winningNumbers).toEqual([8, 15, 26, 34, 40, 49]);
+    expect(result!.extraNumber).toBe(5);
+  });
+
+  it('strips leading JS variable assignment before parsing', () => {
+    const raw = 'var data=' + JSON.stringify([
+      { no: '26/020', date: '21/02/2026', no1: 1, no2: 2, no3: 3, no4: 4, no5: 5, no6: 6, sno: 7 },
+    ]) + ';';
+    const result = parseHkjcJson(raw);
+    expect(result).not.toBeNull();
+    expect(result!.winningNumbers).toEqual([1, 2, 3, 4, 5, 6]);
+  });
+
+  it('returns null for invalid JSON', () => {
+    expect(parseHkjcJson('not json at all')).toBeNull();
+  });
+
+  it('returns null when fewer than 6 winning numbers present', () => {
+    const raw = JSON.stringify([{ no: '26/020', date: '2026-02-21', no1: 1, no2: 2, no3: 3, sno: 7 }]);
+    expect(parseHkjcJson(raw)).toBeNull();
   });
 });
