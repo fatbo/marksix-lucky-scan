@@ -288,10 +288,12 @@ export default function TicketUpload() {
 
       {scanning && (
         <Box sx={{ mt: 2 }}>
-          <Typography>{t('upload.scanning')}</Typography>
+          <Typography>
+            {progress < 100 ? t('upload.modelLoading') : t('upload.scanning')}
+          </Typography>
           <LinearProgress variant="determinate" value={progress} sx={{ mt: 1, height: 8, borderRadius: 4 }} />
           <Typography variant="caption" color="text.secondary">
-            {progress}%
+            {progress < 100 ? `${progress}%` : t('upload.scanning')}
           </Typography>
         </Box>
       )}
@@ -299,7 +301,7 @@ export default function TicketUpload() {
       <Collapse in={ocrDone}>
         <Box sx={{ mt: 2 }}>
           <Alert severity="success" sx={{ mb: 2 }}>
-            {t('upload.scanComplete')} — {confidence.toFixed(0)}% confidence
+            {t('upload.scanComplete')}{confidence > 0 ? ` — ${confidence.toFixed(0)}% confidence` : ''}
           </Alert>
 
           {preview && (

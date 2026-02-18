@@ -9,7 +9,8 @@ const zh = {
     upload: {
       title: '上傳彩票',
       dropzone: '拖放彩票圖片，或點擊選擇',
-      scanning: '正在掃描彩票...',
+      scanning: '正在執行 AI OCR⋯首次使用可能需要 5–15 秒',
+      modelLoading: '正在載入 AI 模型（TrOCR）⋯',
       scanComplete: '掃描完成',
       rescan: '重新掃描',
       save: '儲存記錄',
@@ -73,7 +74,7 @@ const zh = {
       description: '六合彩幸運掃描是一個注重隱私的客戶端彩票核對工具。所有處理都在您的瀏覽器中進行——不會向任何伺服器發送數據。',
       features: '功能',
       featureList: [
-        '使用 Tesseract.js 的 OCR 彩票掃描',
+        '使用 TrOCR（microsoft/trocr-base-printed）AI 彩票掃描',
         '使用 IndexedDB 本地儲存',
         '開獎結果比對',
         '多語言支持（EN/中文）',

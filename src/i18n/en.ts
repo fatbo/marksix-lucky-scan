@@ -9,7 +9,8 @@ const en = {
     upload: {
       title: 'Upload Ticket',
       dropzone: 'Drag & drop a ticket image, or click to select',
-      scanning: 'Scanning ticket...',
+      scanning: 'Running AI OCR... may take 5–15 seconds on first use',
+      modelLoading: 'Loading AI model (TrOCR)...',
       scanComplete: 'Scan Complete',
       rescan: 'Rescan',
       save: 'Save Record',
@@ -73,7 +74,7 @@ const en = {
       description: 'Mark Six Lucky Scan is a privacy-focused, client-side lottery ticket checker. All processing happens in your browser — no data is sent to any server.',
       features: 'Features',
       featureList: [
-        'OCR ticket scanning with Tesseract.js',
+        'AI OCR ticket scanning with TrOCR (microsoft/trocr-base-printed)',
         'Local storage using IndexedDB',
         'Draw result comparison',
         'Multi-language support (EN/中文)',

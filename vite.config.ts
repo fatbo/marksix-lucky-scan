@@ -6,6 +6,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig({
   base: '/marksix-lucky-scan/',
+  optimizeDeps: {
+    exclude: ['@huggingface/transformers'],
+  },
   test: {
     globals: true,
     environment: 'jsdom',
