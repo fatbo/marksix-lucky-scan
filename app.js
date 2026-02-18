@@ -43,7 +43,8 @@ function setupEventListeners() {
         });
         // Auto-focus next input
         input.addEventListener('input', (e) => {
-            if (e.target.value.length === 2 && index < numberInputs.length - 1) {
+            const value = parseInt(e.target.value);
+            if (e.target.value.length === 2 && !isNaN(value) && value >= 1 && value <= 49 && index < numberInputs.length - 1) {
                 numberInputs[index + 1].focus();
             }
         });
