@@ -4,75 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mark Six Lucky Scan - Verify Your Lottery Numbers</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🎰 Mark Six Lucky Scan</h1>
-            <p class="subtitle">Verify your lottery numbers instantly</p>
-        </header>
-
-        <main>
-            <!-- Latest Results Section -->
-            <section class="results-section">
-                <h2>Latest Draw Results</h2>
-                <div id="latestResults" class="results-display">
-                    <div class="draw-info">
-                        <p><strong>Draw Date:</strong> <span id="drawDate">-</span></p>
-                        <p><strong>Draw Number:</strong> <span id="drawNumber">-</span></p>
-                    </div>
-                    <div class="balls-container">
-                        <div class="winning-balls" id="winningBalls">
-                            <div class="ball">?</div>
-                            <div class="ball">?</div>
-                            <div class="ball">?</div>
-                            <div class="ball">?</div>
-                            <div class="ball">?</div>
-                            <div class="ball">?</div>
-                        </div>
-                        <div class="extra-ball-section">
-                            <span class="extra-label">+</span>
-                            <div class="ball extra" id="extraBall">?</div>
-                        </div>
-                    </div>
-                </div>
-                <button id="loadResultsBtn" class="btn btn-primary">Load Latest Results</button>
-            </section>
-
-            <!-- User Numbers Input Section -->
-            <section class="input-section">
-                <h2>Enter Your Numbers</h2>
-                <div class="input-container">
-                    <div class="number-inputs" id="userNumberInputs">
-                        <input type="number" class="number-input" min="1" max="49" placeholder="1-49" maxlength="2">
-                        <input type="number" class="number-input" min="1" max="49" placeholder="1-49" maxlength="2">
-                        <input type="number" class="number-input" min="1" max="49" placeholder="1-49" maxlength="2">
-                        <input type="number" class="number-input" min="1" max="49" placeholder="1-49" maxlength="2">
-                        <input type="number" class="number-input" min="1" max="49" placeholder="1-49" maxlength="2">
-                        <input type="number" class="number-input" min="1" max="49" placeholder="1-49" maxlength="2">
-                    </div>
-                    <button id="verifyBtn" class="btn btn-success">Verify Numbers</button>
-                    <button id="clearBtn" class="btn btn-secondary">Clear</button>
-                </div>
-                <div id="errorMessage" class="error-message"></div>
-            </section>
-
-            <!-- Verification Result Section -->
-            <section class="verification-section" id="verificationSection">
-                <h2>Verification Result</h2>
-                <div id="verificationResult" class="verification-result">
-                    <!-- Results will be displayed here -->
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <p>Mark Six Lucky Scan - Check your lottery numbers easily</p>
-            <p class="disclaimer">For entertainment purposes only. Always verify with official sources.</p>
-        </footer>
-    </div>
-
-    <script src="app.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
 </body>
 </html>
