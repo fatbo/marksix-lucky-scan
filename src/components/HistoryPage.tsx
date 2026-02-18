@@ -84,8 +84,7 @@ export default function HistoryPage() {
       const text = await file.text();
       const data: TicketRecord[] = JSON.parse(text);
       for (const record of data) {
-        const { id: _id, ...rest } = record;
-        void _id;
+        const { id: _, ...rest } = record;
         await db.tickets.add(rest);
       }
       showSnackbar(t('history.imported'));
