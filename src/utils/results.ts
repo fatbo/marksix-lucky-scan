@@ -11,7 +11,9 @@ export async function fetchDrawResult(drawNumber: string): Promise<DrawResult | 
     const html = await response.text();
     return parseResultHTML(html, drawNumber);
   } catch {
-    // CORS likely blocked - try with a public CORS proxy
+    // CORS likely blocked - try with a public CORS proxy.
+    // NOTE: This routes data through a third-party service. Users concerned about
+    // privacy should verify results directly on the HKJC website instead.
     try {
       const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`${HKJC_URL}&drwNo=${drawNumber.replace('/', '')}`)}`;
       const response = await fetch(proxyUrl);

@@ -16,7 +16,7 @@ export const useAppStore = create<AppState>((set) => ({
       localStorage.setItem('darkMode', String(next));
       return { darkMode: next };
     }),
-  snackbar: { open: false, message: '', severity: 'info' as const },
+  snackbar: { open: false, message: '', severity: 'info' },
   showSnackbar: (message, severity = 'success') =>
     set({ snackbar: { open: true, message, severity } }),
   hideSnackbar: () =>

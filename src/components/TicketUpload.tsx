@@ -185,8 +185,7 @@ export default function TicketUpload() {
       <Collapse in={ocrDone}>
         <Box sx={{ mt: 2 }}>
           <Alert severity="success" sx={{ mb: 2 }}>
-            {t('upload.scanComplete')} — {t('common.loading').replace('...', '')}{' '}
-            {confidence.toFixed(0)}% confidence
+            {t('upload.scanComplete')} — {confidence.toFixed(0)}% confidence
           </Alert>
 
           {preview && (
