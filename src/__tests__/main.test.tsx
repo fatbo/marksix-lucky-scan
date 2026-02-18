@@ -23,6 +23,6 @@ describe('main entry routing', () => {
     const strictModeElement = render.mock.calls[0][0];
     const browserRouterElement = strictModeElement.props.children;
     expect(browserRouterElement.type).toBe(browserRouter);
-    expect(browserRouterElement.props.basename).toBe('/marksix-lucky-scan/');
+    expect(browserRouterElement.props.basename).toBe(import.meta.env.BASE_URL);
   });
 });
