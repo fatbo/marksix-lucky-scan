@@ -3,6 +3,7 @@ import Tesseract from 'tesseract.js';
 export interface OcrResult {
   drawNumber: string;
   numbers: number[];
+  bets: number[][];
   units: number;
   amount: number;
   rawText: string;
@@ -23,10 +24,13 @@ export async function performOCR(
 
   const text = result.data.text;
   const confidence = result.data.confidence;
+  const bets = extractBets(text);
+  const numbers = bets[0] ?? extractNumbers(text);
 
   return {
     drawNumber: extractDrawNumber(text),
-    numbers: extractNumbers(text),
+    numbers,
+    bets: bets.length > 0 ? bets : (numbers.length > 0 ? [numbers] : []),
     units: extractUnits(text),
     amount: extractAmount(text),
     rawText: text,
@@ -65,6 +69,41 @@ export function extractNumbers(text: string): number[] {
     }
   }
   return allNumbers.slice(0, 7); // Max 7 numbers (6 + extra)
+}
+
+/**
+ * Extract multiple bets from OCR text.
+ * Handles formats like:
+ *   8+15+26+34+40+49 / 5+17+20+21+22+23
+ *   or one bet per line
+ */
+export function extractBets(text: string): number[][] {
+  const bets: number[][] = [];
+
+  // Find bet patterns: exactly 6 numbers joined by '+' or '-'
+  const betPattern = /(\d{1,2}(?:[+-]\d{1,2}){5})/g;
+  const matches = text.match(betPattern);
+  if (matches) {
+    for (const m of matches) {
+      const nums = m
+        .split(/[+-]/)
+        .map((n) => parseInt(n, 10))
+        .filter((n) => !isNaN(n) && n >= 1 && n <= 49);
+      if (nums.length >= 6) {
+        bets.push(nums.slice(0, 6));
+      }
+    }
+  }
+
+  // If no '+'-separated bets found, fall back to extractNumbers (single bet)
+  if (bets.length === 0) {
+    const nums = extractNumbers(text);
+    if (nums.length >= 3) {
+      bets.push(nums.slice(0, 6));
+    }
+  }
+
+  return bets;
 }
 
 export function extractUnits(text: string): number {

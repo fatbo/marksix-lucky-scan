@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractDrawNumber, extractNumbers, extractUnits, extractAmount } from '../utils/ocr';
+import { extractDrawNumber, extractNumbers, extractUnits, extractAmount, extractBets } from '../utils/ocr';
 
 describe('OCR extraction functions', () => {
   describe('extractDrawNumber', () => {
@@ -64,6 +64,42 @@ describe('OCR extraction functions', () => {
     });
     it('defaults to 10', () => {
       expect(extractAmount('no amount')).toBe(10);
+    });
+  });
+
+  describe('extractBets', () => {
+    it('extracts a single bet from +- separated numbers', () => {
+      const result = extractBets('8+15+26+34+40+49');
+      expect(result.length).toBe(1);
+      expect(result[0]).toEqual([8, 15, 26, 34, 40, 49]);
+    });
+
+    it('extracts multiple bets separated by space or line breaks', () => {
+      const result = extractBets('8+15+26+34+40+49\n5+17+20+21+22+23');
+      expect(result.length).toBe(2);
+      expect(result[0]).toEqual([8, 15, 26, 34, 40, 49]);
+      expect(result[1]).toEqual([5, 17, 20, 21, 22, 23]);
+    });
+
+    it('falls back to extractNumbers when no + pattern found', () => {
+      const result = extractBets('1 12 23 34 45 49');
+      expect(result.length).toBe(1);
+      expect(result[0].length).toBeGreaterThanOrEqual(3);
+    });
+
+    it('returns empty array when no numbers found', () => {
+      const result = extractBets('no numbers here');
+      expect(result).toEqual([]);
+    });
+
+    it('filters numbers out of range (1-49) within bets', () => {
+      // 50 is out of range; the remaining 5 valid numbers get returned via fallback
+      const result = extractBets('8+15+26+34+40+50');
+      // The bet with 50 filtered out has < 6 valid numbers, so it doesn't count as a full bet
+      // but fallback extractNumbers may still return the partial set
+      if (result.length > 0) {
+        expect(result[0]).not.toContain(50);
+      }
     });
   });
 });

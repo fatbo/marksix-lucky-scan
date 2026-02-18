@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -12,16 +12,25 @@ import {
   CardContent,
   Stack,
   Collapse,
+  Divider,
 } from '@mui/material';
-import { CloudUpload, Save, Search, Refresh } from '@mui/icons-material';
+import { CloudUpload, Save, Search, Refresh, Download } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { performOCR, type OcrResult } from '../utils/ocr';
-import { fetchDrawResult, compareNumbers } from '../utils/results';
+import { fetchLatestResult, fetchDrawResult, compareNumbers } from '../utils/results';
 import { db } from '../db';
 import { useAppStore } from '../store';
 import type { TicketRecord, DrawResult, ComparisonResult } from '../types';
 import NumberBall from './NumberBall';
+
+// Mock data used as fallback when live fetch fails
+const MOCK_RESULT: DrawResult = {
+  drawNumber: '24/015',
+  drawDate: '2026-02-15',
+  winningNumbers: [3, 12, 18, 27, 35, 42],
+  extraNumber: 9,
+};
 
 export default function TicketUpload() {
   const { t } = useTranslation();
@@ -40,11 +49,43 @@ export default function TicketUpload() {
   const [amount, setAmount] = useState('10');
   const [note, setNote] = useState('');
 
+  // Multiple bets from OCR
+  const [bets, setBets] = useState<number[][]>([]);
+
+  // Latest-results section
+  const [selectedDate, setSelectedDate] = useState('');  // date picker value (YYYY-MM-DD)
+  const [latestResult, setLatestResult] = useState<DrawResult | null>(null);
+  const [loadingLatest, setLoadingLatest] = useState(false);
+  const [latestError, setLatestError] = useState('');
+  const [usedMock, setUsedMock] = useState(false);
+
   // Result checking
   const [drawResult, setDrawResult] = useState<DrawResult | null>(null);
   const [comparison, setComparison] = useState<ComparisonResult | null>(null);
   const [fetchingResult, setFetchingResult] = useState(false);
   const [resultError, setResultError] = useState('');
+
+  // Load latest results on mount
+  useEffect(() => {
+    handleLoadLatest();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleLoadLatest = useCallback(async (date?: string) => {
+    setLoadingLatest(true);
+    setLatestError('');
+    setUsedMock(false);
+    try {
+      const result = await fetchLatestResult(date || undefined);
+      setLatestResult(result);
+    } catch {
+      setLatestResult(MOCK_RESULT);
+      setUsedMock(true);
+      setLatestError(t('results.fetchFailed'));
+    } finally {
+      setLoadingLatest(false);
+    }
+  }, [t]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     if (acceptedFiles.length === 0) return;
@@ -55,6 +96,7 @@ export default function TicketUpload() {
     setDrawResult(null);
     setComparison(null);
     setResultError('');
+    setBets([]);
 
     // Preview
     const reader = new FileReader();
@@ -65,6 +107,7 @@ export default function TicketUpload() {
       const result: OcrResult = await performOCR(file, setProgress);
       setDrawNumber(result.drawNumber);
       setNumbers(result.numbers.join(', '));
+      setBets(result.bets);
       setUnits(String(result.units));
       setAmount(String(result.amount));
       setRawText(result.rawText);
@@ -141,16 +184,87 @@ export default function TicketUpload() {
     setNote('');
     setRawText('');
     setConfidence(0);
+    setBets([]);
     setDrawResult(null);
     setComparison(null);
     setResultError('');
   };
 
+  const handleSelectBet = (bet: number[]) => {
+    setNumbers(bet.join(', '));
+  };
+
   return (
     <Box>
+      {/* ── Latest Draw Results ── */}
+      <Typography variant="h5" gutterBottom fontWeight="bold">
+        {t('results.title')}
+      </Typography>
+
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems="center" flexWrap="wrap">
+          <TextField
+            type="date"
+            label={t('fields.drawDate')}
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            size="small"
+            InputLabelProps={{ shrink: true }}
+            sx={{ minWidth: 160 }}
+          />
+          <Button
+            variant="contained"
+            startIcon={<Download />}
+            onClick={() => handleLoadLatest(selectedDate || undefined)}
+            disabled={loadingLatest}
+            aria-label={t('results.loadLatest')}
+          >
+            {loadingLatest ? t('results.loadingLatest') : t('results.loadLatest')}
+          </Button>
+        </Stack>
+
+        {loadingLatest && <LinearProgress sx={{ mt: 1 }} />}
+
+        {latestError && (
+          <Alert severity="warning" sx={{ mt: 1 }}>
+            {latestError}
+          </Alert>
+        )}
+
+        {latestResult && !loadingLatest && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('results.drawDate')}: <strong>{latestResult.drawDate}</strong>
+              &nbsp;|&nbsp;
+              {t('fields.drawNumber')}: <strong>{latestResult.drawNumber}</strong>
+              {usedMock && (
+                <Chip label="sample" size="small" color="warning" sx={{ ml: 1 }} />
+              )}
+            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1, alignItems: 'center' }}>
+              {latestResult.winningNumbers.map((n) => (
+                <NumberBall key={n} number={n} matched={false} />
+              ))}
+              <Chip label="+" size="small" />
+              <NumberBall number={latestResult.extraNumber} isExtra matched={false} />
+            </Box>
+            <Alert severity="info" sx={{ mt: 1 }}>
+              {t('results.disclaimer')}
+            </Alert>
+          </Box>
+        )}
+      </Paper>
+
+      <Divider sx={{ mb: 3 }} />
+
+      {/* ── Ticket Upload / OCR ── */}
       <Typography variant="h5" gutterBottom fontWeight="bold">
         {t('upload.title')}
       </Typography>
+
+      <Alert severity="success" sx={{ mb: 2 }}>
+        {t('upload.privacyNote')}
+      </Alert>
 
       {!ocrDone && !scanning && (
         <Paper
@@ -196,6 +310,26 @@ export default function TicketUpload() {
                 style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8 }}
               />
             </Box>
+          )}
+
+          {/* Multiple bets selector */}
+          {bets.length > 1 && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              {t('upload.multipleBets')}
+              <Box sx={{ mt: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {bets.map((bet, i) => (
+                  <Button
+                    key={i}
+                    size="small"
+                    variant="outlined"
+                    onClick={() => handleSelectBet(bet)}
+                    aria-label={`${t('upload.selectBet')} ${i + 1}`}
+                  >
+                    {`${t('upload.betNumber', { number: i + 1 })}: ${bet.join(', ')}`}
+                  </Button>
+                ))}
+              </Box>
+            </Alert>
           )}
 
           <Stack spacing={2}>
