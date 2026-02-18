@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# Mark Six Lucky Scan 🎰 六合彩幸運掃描
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A privacy-focused, client-side-only web application for checking Hong Kong Mark Six (六合彩) lottery tickets. All processing happens entirely in your browser — no data is ever sent to any server.
 
-Currently, two official plugins are available:
+![Home Page](https://github.com/user-attachments/assets/dbc3975b-8197-4b55-a68b-df6f1089c287)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **OCR Ticket Scanning** — Upload a ticket image (JPEG/PNG) and extract data using Tesseract.js
+- **Editable Fields** — Correct OCR mistakes for draw number, selected numbers, units, and amount
+- **Local Storage** — All records saved in IndexedDB using Dexie.js (never leaves your browser)
+- **History Management** — View, edit, delete, export (JSON), and import records
+- **Draw Result Checking** — Fetch official results and compare your numbers
+- **Prize Calculation** — Automatic detection of prize tiers (1st through 7th)
+- **Multi-language** — English + Traditional Chinese (繁體中文)
+- **Dark Mode** — Toggle between light and dark themes
+- **PWA** — Installable, works offline for viewing history
+- **Mobile-First** — Responsive design optimized for phone use
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **Framework:** React 18+ with Vite
+- **Language:** TypeScript
+- **UI:** MUI (Material-UI) v5+
+- **OCR:** Tesseract.js
+- **Storage:** Dexie.js (IndexedDB)
+- **State:** Zustand
+- **Routing:** React Router
+- **i18n:** i18next + react-i18next
+- **PWA:** vite-plugin-pwa
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | TypeScript check + production build |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run Vitest tests |
+| `npm run preview` | Preview production build |
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Disclaimer
+
+This app is unofficial and not affiliated with the Hong Kong Jockey Club (HKJC). Always verify results on the [official HKJC website](https://bet.hkjc.com/marksix/results.aspx?lang=en).

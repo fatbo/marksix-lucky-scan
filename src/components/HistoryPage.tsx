@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box,
   Typography,
@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { Delete, Edit, FileDownload, FileUpload, Search } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { useAppStore } from '../store';
 import type { TicketRecord } from '../types';
@@ -28,27 +29,17 @@ import NumberBall from './NumberBall';
 export default function HistoryPage() {
   const { t } = useTranslation();
   const { showSnackbar } = useAppStore();
-  const [records, setRecords] = useState<TicketRecord[]>([]);
+  const records = useLiveQuery(() => db.tickets.orderBy('uploadDate').reverse().toArray()) ?? [];
   const [editRecord, setEditRecord] = useState<TicketRecord | null>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [resultMap, setResultMap] = useState<Record<number, { result: DrawResult; comparison: ComparisonResult }>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const loadRecords = async () => {
-    const all = await db.tickets.orderBy('uploadDate').reverse().toArray();
-    setRecords(all);
-  };
-
-  useEffect(() => {
-    loadRecords();
-  }, []);
-
   const handleDelete = async () => {
     if (deleteId !== null) {
       await db.tickets.delete(deleteId);
       setDeleteId(null);
-      loadRecords();
     }
   };
 
@@ -62,7 +53,6 @@ export default function HistoryPage() {
         userNote: editRecord.userNote,
       });
       setEditOpen(false);
-      loadRecords();
     }
   };
 
@@ -84,11 +74,11 @@ export default function HistoryPage() {
       const text = await file.text();
       const data: TicketRecord[] = JSON.parse(text);
       for (const record of data) {
-        const { id: _, ...rest } = record;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { id: _id, ...rest } = record;
         await db.tickets.add(rest);
       }
       showSnackbar(t('history.imported'));
-      loadRecords();
     } catch {
       showSnackbar(t('common.error'), 'error');
     }
